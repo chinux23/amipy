@@ -11,6 +11,7 @@ def package_files(directory):
     return paths
 
 # extra_files = package_files('amipy/package_template')
+extra_files = []
 
 with open('README.md') as f:
     readme = f.read()
@@ -29,7 +30,7 @@ setup(
     # data_files=[('package_template', ['*.jpeg'])],
     # include_package_data=True,
     install_requires = [
-
+        "win32com",
     ], # any dependencies internal or world (OPTIONAL)
     entry_points={
         'console_scripts': [
