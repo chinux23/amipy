@@ -2,6 +2,7 @@ from win32com.client import Dispatch
 import os
 import logging
 import re
+from amipy.strategy import AmibrokerStrategy
 
 
 class Amibroker:
@@ -42,7 +43,7 @@ class Amibroker:
             raise Exception("{} not found.".format(path))
 
         files = []
-        for dirName, subdirList, fileList in os.walk(path):
+        for dirName, _, fileList in os.walk(path):
             for file in fileList:
                 files.append((dirName, file))
 
@@ -50,6 +51,25 @@ class Amibroker:
             files = [ file for file in files if regularexpression.match(file[1]) ]
 
         return files
+
+    def scan_strategies(self, path):
+        """
+        return a list of strategy objects.
+        """
+
+        pattern = re.compile(r"\d+_[a-zA-Z]+_\d+_[a-zA-Z]+_\d+.afl")
+        files = self.scan_afl(path, regularexpression=pattern)
+        
+        strategies = []
+
+        for file in files:
+            path, filename = file
+            path = os.path.join(path, filename)
+            s_id, s_product, s_period, s_name, _ = filename.split("_")
+            strategy_obj = Strategy(s_name, s_id, s_product, s_period, path)
+            strategies.append(strategy_obj)
+
+        return strategies
 
 if __name__ == "__main__":
     pass

@@ -10,15 +10,14 @@ def package_files(directory):
             paths.append(os.path.join('..', path, filename))
     return paths
 
-# extra_files = package_files('amipy/package_template')
-extra_files = []
+extra_files = package_files('Resources')
 
 with open('README.md') as f:
     readme = f.read()
 
 setup(
     name='amipy',
-    version='1.0.35',
+    version='0.3.1',
     description='PythonAutomation for Amibroker', # short description
     long_description=readme, # long description from the readme file
     license='MIT', # for internal packages
@@ -30,7 +29,7 @@ setup(
     # data_files=[('package_template', ['*.jpeg'])],
     # include_package_data=True,
     install_requires = [
-        "win32com",
+        "pypiwin32",
     ], # any dependencies internal or world (OPTIONAL)
     entry_points={
         'console_scripts': [
