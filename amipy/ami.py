@@ -58,7 +58,7 @@ class Amibroker:
         return a list of strategy objects.
         """
 
-        pattern = re.compile(r"\d+_[a-zA-Z]+_\d+_[a-zA-Z]+_\d+.afl")
+        pattern = re.compile(r"\d+_[a-zA-Z]+_\d+_[a-zA-Z]+_\d+.afl$")
         files = self.scan_afl(path, regularexpression=pattern)
         
         strategies = []
@@ -72,20 +72,20 @@ class Amibroker:
 
         return strategies
 
-    def backtest(self, strategy):
+    def backtest(self, strategy, resultfile):
         self.ab.Documents.close()
         self.ab.Documents.open(strategy.symbol)
         
         assert strategy.destination, "You should generate the apx before running backtest."
 
         analysis = self.ab.AnalysisDocs.Open(strategy.destination)
-        if ( analysis ):
-            analysis.Run( 3 )
+        if analysis:
+            analysis.Run(3)
 
-            while (analysis.IsBusy):
+            while analysis.IsBusy:
                 time.sleep( 0.5 )
 
-            analysis.Export( "test.csv" )
+            analysis.Export( resultfile )
             analysis.Close()
 
         self.ab.Documents.close()
