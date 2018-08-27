@@ -66,7 +66,7 @@ class Amibroker:
             path, filename = file
             path = os.path.join(path, filename)
             s_id, s_product, s_period, s_name, _ = filename.split("_")
-            strategy_obj = Strategy(s_name, s_id, s_product, s_period, path)
+            strategy_obj = AmibrokerStrategy(s_name, s_id, s_product, s_period, path)
             strategies.append(strategy_obj)
 
         return strategies

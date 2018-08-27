@@ -1,7 +1,8 @@
 import xml.etree.ElementTree as ET
+from xml.sax.saxutils import escape
+import copy
 
-template = """
-<?xml version="1.0" encoding="ISO-8859-1"?>
+template = """<?xml version="1.0" encoding="ISO-8859-1"?>
 <AmiBroker-Analysis CompactMode="0">
 <General>
 <FormatVersion>1</FormatVersion>
@@ -255,8 +256,7 @@ class ProjectSetting:
 
     def __init__(self):
         # load the xml string
-        self.xml = ET.fromstring(template)
-        self.root = self.xml.getroot()
+        self.root = ET.fromstring(copy.copy(template))
         self.General = self.root.getchildren()[0]
         self.BacktestSettings = self.root.getchildren()[1]
 
@@ -265,47 +265,98 @@ class ProjectSetting:
         self._formulapath = self.General.find("FormulaPath")
         self._period = self.BacktestSettings.find("Periodicity")
 
-    def set_symbol(self, symbol):
-        self._symbol.text = symbol
-
+    @property
     def symbol(self):
         return self._symbol.text
 
-    def set_period(self, period):
+    @symbol.setter
+    def symbol(self, symbol):
+        self._symbol.text = symbol
+
+    @property
+    def period(self):
+        return self._period.text
+
+    @period.setter
+    def period(self, period):
         """
         settings.set_period(daily)
         """
         self._period.text = str(period)
 
-    def period(self):
-        return self._period.text
-
-    def set_forumla(self, text):
-        self._formula.text = text
-
-    def forumla(self):
+    @property
+    def formula(self):
         return self._formula.text
 
+    def set_formula(self, text):
+        self._formula.text = text
+
+    @property
     def path(self):
         return self._formulapath.text
 
-    def set_path(self, path):
+    @path.setter
+    def path(self, path):
         self._formulapath.text = path
 
     def save(self, path):
-        self.root.write(path)
 
+        tree = ET.ElementTree(self.root)
+        tree.write(path, encoding="ISO-8859-1")
+        
+        # content = ET.tostring(self.root, encoding="ISO-8859-1", method='xml')
+
+        # with open(path, "wb") as f:
+        #     f.write(content)
+
+    @classmethod
+    def amibroker_period(interval):
+        """
+        amibroker uses a string to represent time intervals, which is different than literal translation.
+        """
+        dictionary = { "15" : ProjectSetting.min_15, 
+                        "5" : ProjectSetting.min_5,
+                        "1" : ProjectSetting.min_1,
+                        "3" : ProjectSetting.min_3, 
+                        "7" : ProjectSetting.min_7, 
+                        "10": ProjectSetting.min_10, 
+                        "12": ProjectSetting.min_12, 
+                        "20": ProjectSetting.min_20,
+                        "60": ProjectSetting.hourly,
+                        "720": ProjectSetting.daily, 
+                        "1440": ProjectSetting.daynight }
+
+        return dictionary[interval]
 
 class AmibrokerStrategy:
 
-    def __init__(self, name, id, prod, interval, path):
+    def __init__(self, name, id, symbol, interval, path):
         self.name = name
         self.id = id
-        self.prod = prod
+        self.symbol = symbol
         self.interval = interval
         self.path = path
+        self.settings = ProjectSetting()
+        self.settings.symbol = self.symbol
+        self.settings.period = self.interval
+        self.settings.path = self.path
 
-    def generate_apx(self, path):
-        pass
+        with open(self.path, "rb") as f:
+            # A little commment on what is happening below:
+            # 1. After reading the file as binary and convert it to string, python will add b'' to the string
+            # Therefore Remove b' in the beginning and ' in the end.
+            # 2. Amibroker seems to add \r\n at the end of the file. So we are adding that as well to make it the same.
+            formula = str(f.read())[2:-1] + r"\r\n"
+            self.settings.set_formula(formula)
+
+    def __str__(self):
+        return "{id}_{symbol}_{period}_{name}".format(
+            id=self.id, symbol=self.symbol, period=self.interval, name=self.name)
+
+    def generate_apx(self, destination):
+        """
+        Generate Amibroker apx project file in the destination folder.
+        """
+        self.settings.save(destination)
 
     
