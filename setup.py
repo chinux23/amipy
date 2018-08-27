@@ -17,7 +17,7 @@ with open('README.md') as f:
 
 setup(
     name='amipy',
-    version='0.3.6',
+    version='0.3.7',
     description='PythonAutomation for Amibroker', # short description
     long_description=readme, # long description from the readme file
     license='MIT', # for internal packages

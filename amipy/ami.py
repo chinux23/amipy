@@ -3,6 +3,7 @@ import os
 import logging
 import re
 from amipy.strategy import AmibrokerStrategy
+import time
 
 
 class Amibroker:
@@ -70,6 +71,26 @@ class Amibroker:
             strategies.append(strategy_obj)
 
         return strategies
+
+    def backtest(self, strategy):
+        self.ab.Documents.close()
+        self.ab.Documents.open(strategy.symbol)
+        
+        assert strategy.destination, "You should generate the apx before running backtest."
+
+        analysis = self.ab.AnalysisDocs.Open(strategy.destination)
+        if ( analysis ):
+            analysis.Run( 3 )
+
+            while (analysis.IsBusy):
+                time.sleep( 0.5 )
+
+            analysis.Export( "test.csv" )
+            analysis.Close()
+
+        self.ab.Documents.close()
+
+
 
 if __name__ == "__main__":
     pass

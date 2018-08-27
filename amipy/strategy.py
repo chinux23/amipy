@@ -282,7 +282,7 @@ class ProjectSetting:
         """
         settings.set_period(daily)
         """
-        self._period.text = str(period)
+        self._period.text = str(ProjectSetting.amibroker_period(int(period)))
 
     @property
     def formula(self):
@@ -297,7 +297,7 @@ class ProjectSetting:
 
     @path.setter
     def path(self, path):
-        self._formulapath.text = path
+        self._formulapath.text = repr(path)
 
     def save(self, path):
 
@@ -309,22 +309,22 @@ class ProjectSetting:
         # with open(path, "wb") as f:
         #     f.write(content)
 
-    @classmethod
+    @staticmethod
     def amibroker_period(interval):
         """
         amibroker uses a string to represent time intervals, which is different than literal translation.
         """
-        dictionary = { "15" : ProjectSetting.min_15, 
-                        "5" : ProjectSetting.min_5,
-                        "1" : ProjectSetting.min_1,
-                        "3" : ProjectSetting.min_3, 
-                        "7" : ProjectSetting.min_7, 
-                        "10": ProjectSetting.min_10, 
-                        "12": ProjectSetting.min_12, 
-                        "20": ProjectSetting.min_20,
-                        "60": ProjectSetting.hourly,
-                        "720": ProjectSetting.daily, 
-                        "1440": ProjectSetting.daynight }
+        dictionary = { 15 : ProjectSetting.min_15, 
+                        5 : ProjectSetting.min_5,
+                        1 : ProjectSetting.min_1,
+                        3 : ProjectSetting.min_3, 
+                        7 : ProjectSetting.min_7, 
+                        10: ProjectSetting.min_10, 
+                        12: ProjectSetting.min_12, 
+                        20: ProjectSetting.min_20,
+                        60: ProjectSetting.hourly,
+                        720: ProjectSetting.daily, 
+                        1440: ProjectSetting.daynight }
 
         return dictionary[interval]
 
@@ -340,6 +340,7 @@ class AmibrokerStrategy:
         self.settings.symbol = self.symbol
         self.settings.period = self.interval
         self.settings.path = self.path
+        self.destination = None
 
         with open(self.path, "rb") as f:
             # A little commment on what is happening below:
@@ -357,6 +358,7 @@ class AmibrokerStrategy:
         """
         Generate Amibroker apx project file in the destination folder.
         """
+        self.destination = destination
         self.settings.save(destination)
 
     
