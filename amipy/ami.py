@@ -53,20 +53,22 @@ class Amibroker:
 
         return files
 
-    def scan_strategies(self, path):
+    def scan_strategies(self, path, regularexpression=None):
         """
         return a list of strategy objects.
         """
 
-        pattern = re.compile(r"\d+_[a-zA-Z]+_\d+_[a-zA-Z]+_\d+.afl$")
-        files = self.scan_afl(path, regularexpression=pattern)
+        files = self.scan_afl(path, regularexpression)
         
         strategies = []
 
         for file in files:
             path, filename = file
             path = os.path.join(path, filename)
-            s_id, s_product, s_period, s_name, _ = filename.split("_")
+            base = os.path.splitext(filename)[0]
+            fields = base.split("_")
+            s_id, s_product, s_period = fields[:3]
+            s_name = "_".join(fields[3:])
             strategy_obj = AmibrokerStrategy(s_name, s_id, s_product, s_period, path)
             strategies.append(strategy_obj)
 
