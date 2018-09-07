@@ -17,7 +17,7 @@ with open('README.md') as f:
 
 setup(
     name='amipy',
-    version='0.4.0',
+    version='0.4.1',
     description='PythonAutomation for Amibroker', # short description
     long_description=readme, # long description from the readme file
     license='MIT', # for internal packages
@@ -25,7 +25,7 @@ setup(
     author_email='chinux@gmail.com',
     url='https://github.com/chinux23/amipy', # wherever your code lives
     packages=['amipy'], # or py_modules (see below for more details)
-    package_data={'maui': extra_files},
+    package_data={'amipy': extra_files},
     # data_files=[('package_template', ['*.jpeg'])],
     # include_package_data=True,
     install_requires = [

@@ -328,17 +328,35 @@ class ProjectSetting:
 
         return dictionary[interval]
 
-class AmibrokerStrategy:
 
-    def __init__(self, name, id, symbol, interval, path):
+class Strategy:
+    
+    """
+    #TODO: Refactor all strategies so that they are all inherited from Strategy class.
+        1. For amibroker, we need to create a singleton class.
+    """
+
+    def __init__(self, name, id, symbol, interval):
         self.name = name
         self.id = id
         self.symbol = symbol
         self.interval = interval
+
+    def pnl(self):
+        """
+        Generate PnL for this strategy
+        """
+        raise NotImplementedError("subclass of strategy should implement this.")
+    
+
+class AmibrokerStrategy(Strategy):
+
+    def __init__(self, name, id, symbol, interval, path):
+        Strategy.__init__(name, id, symbol, interval)
         self.path = path
         self.settings = ProjectSetting()
-        self.settings.symbol = self.symbol
-        self.settings.period = self.interval
+        self.settings.symbol = symbol
+        self.settings.period = interval
         self.settings.path = self.path
         self.destination = None
 
@@ -361,4 +379,4 @@ class AmibrokerStrategy:
         self.destination = destination
         self.settings.save(destination)
 
-    
+
