@@ -2,6 +2,7 @@ from amipy.strategy import Strategy
 import os
 import pandas as pd
 import pkg_resources
+import pytz
 
 class SymbolConfigurations:
 
@@ -13,10 +14,13 @@ class SymbolConfigurations:
     @classmethod
     def load(cls):
         filepath = pkg_resources.resource_filename("amipy", "Resources/Symbol.xlsx")
-        exchanges = pd.read_excel(filepath, "Basic").set_index("Exchange")
+        exchanges = pd.read_excel(filepath, "Exchange").set_index("exchange")
         symbols = pd.read_excel(filepath, "Symbol").set_index("symbol")
-        basic = pd.read_excel(filepath, "basic").set_index("Symbol")
+        basic = pd.read_excel(filepath, "Basic").set_index("Symbol")
         return cls(exchanges, symbols, basic)
+
+    def timezone(self, symbol):
+        return pytz.timezone(self.exchanges.loc[symbol][0])
 
 
 class Performance:
@@ -29,7 +33,7 @@ class Performance:
         self.id = id
         self.name = name
         self.symbol = symbol
-        self.interval = interval
+        self.interval = period
         self.pnl = pnl
 
     @classmethod
@@ -40,7 +44,7 @@ class Performance:
         pnl = pd.read_csv(path, index_col="datetime", parse_dates=True)
         path, filename = os.path.split(path)
         filename, ext = os.path.splitext(filename)
-        s_ID, s_Symbol, s_Period, s_Name, _ = filename.split("_")
+        s_ID, s_Symbol, s_Period, s_Name, _ = filename.split("_")[:5]
 
         return cls(s_ID, s_Name, s_Symbol, s_Period, pnl)
 
