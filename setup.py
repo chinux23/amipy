@@ -29,7 +29,7 @@ setup(
     # data_files=[('package_template', ['*.jpeg'])],
     # include_package_data=True,
     install_requires = [
-        "pypiwin32",
+        'pypiwin32 >= 1.0;platform_system=="Windows"',
     ], # any dependencies internal or world (OPTIONAL)
     entry_points={
         'console_scripts': [

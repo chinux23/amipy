@@ -5,10 +5,19 @@ import pkg_resources
 
 class SymbolConfigurations:
 
+    def __init__(self, exchanges, symbols, basic):
+        self.exchanges = exchanges
+        self.symbols = symbols
+        self.basic = basic
+
     @classmethod
     def load(cls):
         filepath = pkg_resources.resource_filename("amipy", "Resources/Symbol.xlsx")
-        return pd.read_excel(filepath, "Basic").set_index("Symbol")
+        exchanges = pd.read_excel(filepath, "Basic").set_index("Exchange")
+        symbols = pd.read_excel(filepath, "Symbol").set_index("symbol")
+        basic = pd.read_excel(filepath, "basic").set_index("Symbol")
+        return cls(exchanges, symbols, basic)
+
 
 class Performance:
     
@@ -16,27 +25,24 @@ class Performance:
     Performance receives a strategy and then calculate its return.
     """
 
-    def __init__(self, id, name, symbol, interval, trades):
+    def __init__(self, id, name, symbol, period, pnl):
         self.id = id
         self.name = name
         self.symbol = symbol
         self.interval = interval
-        self.trades = trades
+        self.pnl = pnl
 
     @classmethod
     def load(cls, path):
         """
         :param path: the path to the csv
         """
-        trades = pd.read_csv(path, index_col="Date", parse_dates=True)
-        id, symbol, interval = os.path.split(path)[-1].split(".")[0].split("_")
+        pnl = pd.read_csv(path, index_col="datetime", parse_dates=True)
+        path, filename = os.path.split(path)
+        filename, ext = os.path.splitext(filename)
+        s_ID, s_Symbol, s_Period, s_Name, _ = filename.split("_")
 
-        trades = trades[["Trade", "Price", "Ex. date", "Ex. Price", "Profit"]]
-
-        return cls(id, "default", symbol, interval, trades)
-
-    def isEmpty(self):
-        return len(self.trades) == 0
+        return cls(s_ID, s_Name, s_Symbol, s_Period, pnl)
 
     def __str__(self):
         return "{}_{}_{}".format(self.id, self.symbol, self.interval)
