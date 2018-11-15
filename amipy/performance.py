@@ -76,6 +76,9 @@ class Performance:
         returns = self.pnl
         return returns.mean() / returns.std() * np.sqrt(252)
 
+    def expected_return(self):
+        return self.pnl.mean()
+
 
 class Intermediate (Performance):
     """
@@ -192,7 +195,6 @@ class Portfolio:
         else: self.weights = None
         self._variance = None
         self._covariance = None
-        self.avg_return = None
 
     def expected_return(self, weights=None):
         if weights is not None:
@@ -232,3 +234,10 @@ class Portfolio:
 
     def metric(self, weights):
         pass
+
+    def get_returns_vect(self):
+        pnls = [performance.pnl for performance in self.strategies]
+        names = [i for i in range(len(pnls))]
+        returns_dataframe = pd.concat(pnls, axis=1, keys=names).fillna(0)
+        returns_vec = returns_dataframe.values.T
+        return returns_vec
