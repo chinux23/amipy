@@ -89,7 +89,7 @@ class Intermediate (Performance):
         Performance.__init__(self, id, name, symbol, period, pnl)
 
     @classmethod
-    def load(cls, path):
+    def load(cls, path, start_date=None):
         """
         Use the pnls provided and use close data
         """
@@ -107,6 +107,8 @@ class Intermediate (Performance):
                 new_dataframe = pd.concat([pnls[key], close * multipoint * 1.0 / LEVERAGE], join="inner", axis=1)
                 new_dataframe.columns = ["pnl", "base"]
                 new_dataframe["return"] = new_dataframe["pnl"] / new_dataframe["base"]
+                if start_date:
+                    new_dataframe["return"] = new_dataframe[start_date:]
                 results.append(cls(id, name, symbol, period, new_dataframe))
             except Exception as e:
                 print(e)
