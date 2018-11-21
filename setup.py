@@ -19,7 +19,7 @@ with open('README.md') as f:
 
 setup(
     name='amipy',
-    version='0.4.4',
+    version='0.4.5',
     description='PythonAutomation for Amibroker',  # short description
     long_description=readme,  # long description from the readme file
     license='MIT',  # for internal packages
@@ -32,7 +32,8 @@ setup(
     # include_package_data=True,
     install_requires=[
         'pypiwin32 >= 1.0;platform_system=="Windows"',
-        'xlrd'
+        'xlrd',
+        'cvxopt'
     ],  # any dependencies internal or world (OPTIONAL)
     entry_points={
         'console_scripts': [
