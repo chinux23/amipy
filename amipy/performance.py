@@ -108,7 +108,7 @@ class Intermediate (Performance):
                 new_dataframe.columns = ["pnl", "base"]
                 new_dataframe["return"] = new_dataframe["pnl"] / new_dataframe["base"]
                 if start_date:
-                    new_dataframe["return"] = new_dataframe[start_date:]
+                    new_dataframe = new_dataframe[start_date:]
                 results.append(cls(id, name, symbol, period, new_dataframe))
             except Exception as e:
                 print(e)
@@ -238,8 +238,10 @@ class Portfolio:
         pass
 
     def get_returns_vect(self):
+        return self.get_dataframe().values.T
+
+    def get_dataframe(self):
         pnls = [performance.pnl for performance in self.strategies]
         names = [i for i in range(len(pnls))]
         returns_dataframe = pd.concat(pnls, axis=1, keys=names).fillna(0)
-        returns_vec = returns_dataframe.values.T
-        return returns_vec
+        return returns_dataframe
