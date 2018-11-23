@@ -2,6 +2,7 @@ import numpy as np
 import cvxopt as opt
 from cvxopt import blas, solvers
 
+
 # Turn off progress printing
 solvers.options['show_progress'] = False
 

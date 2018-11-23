@@ -242,6 +242,7 @@ class Portfolio:
 
     def get_dataframe(self):
         pnls = [performance.pnl for performance in self.strategies]
-        names = [i for i in range(len(pnls))]
+        names = [performance.id for performance in self.strategies]
+        # names = [i for i in range(len(pnls))]
         returns_dataframe = pd.concat(pnls, axis=1, keys=names).fillna(0)
         return returns_dataframe
